@@ -1,0 +1,3 @@
+Мутация в гетерозиготном состоянии.
+Response to dabigatran etexilate treatment.
+[GWAS Catalog]([http://www.ebi.ac.uk/gwas/search?query=rs2244613])

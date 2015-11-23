@@ -1,0 +1,52 @@
+---
+title: "ПлавЧек"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(rlist)
+```
+
+### Описание
+
+Файл: **`r paste(input$rdmlFile$name[1])`**
+
+Образцы: **`r rdml()$sample %>% list.filter(.$type$value == "unkn") %>% names %>% paste(sep = ", ")`**
+
+Наборы: **`r rdml()$target %>% names %>% paste(sep = ", ")`**
+
+Порог расстояния: **> `r paste(input$distanceLimit)`**
+
+### Сводная таблица
+
+```{r, results = 'asis', echo=FALSE, message=FALSE}
+kable(totalTable())
+```
+
+```{r, results='asis', echo=FALSE, message=FALSE}
+tbl <- totalTable()
+colnames(tbl) <- c("Sample", "Target", "Genotype", "r")
+out <- NULL
+for (sample.name in tbl$Sample %>% unique()) {
+  out <- c(out, sprintf("## %s\n", sample.name))
+  for (target in (tbl %>% filter(Sample == sample.name))$Target %>% unique()) {
+    result <- (tbl %>%
+                 filter(Sample == sample.name &
+                         Target == target))$Genotype
+    path <- sprintf("md/%s_%s.Rmd",
+                    str_replace(target, "\\*", "_"),
+                    result)
+    description <- tryCatch({
+      knit_child(path)},
+      warning = function(w) result)
+    subout <- sprintf("#### %s\n%s\n",
+                      target,
+                      description)
+    out <- c(out, subout)
+  }
+}
+
+```
+`r paste(out, collapse = "\n")`

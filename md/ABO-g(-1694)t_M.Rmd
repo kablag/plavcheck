@@ -1,0 +1,3 @@
+Мутация в гомозиготном состоянии.
+Genetic regulation of serum phytosterol levels and risk of coronary artery disease. 
+[GWAS Catalog](http://www.ebi.ac.uk/gwas/search?query=rs657152)
