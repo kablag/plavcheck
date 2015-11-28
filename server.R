@@ -98,6 +98,7 @@ shinyServer(function(input, output, server) {
                                     sample.type == "pos"))$fdata.name
             deucl <- diss(mpoints.deriv[, c(fnames.unkn, fnames.pos)],
                           "EUCL")
+            # zz[[test.target]] <<- deucl 
             values$hclustResults[[test.target]] <- hclust(deucl, "complete")
             deucl <- deucl %>% as.matrix()
             for (fname.unkn in fnames.unkn){
@@ -179,9 +180,17 @@ shinyServer(function(input, output, server) {
   output$hclustPlot <- renderPlot({
     if (is.null(input$viewTarget))
       return(NULL)
+    # hcr <<- values$hclustResults[[1]]
+    # tt <<- totalTable()
+    # source("http://addictedtor.free.fr/packages/A2R/lastVersion/R/code.R")
+    
+    # colored dendrogram
+    # op = par(bg = "#EFEFEF")
+    # A2Rplot(values$hclustResults[[input$viewTarget]], k = 3, boxes = FALSE, col.up = "gray50",
+    #         col.down = c("#FF6B6B", "#4ECDC4", "#556270"))
     # plot(values$hclustResults[[input$viewTarget]])
     ggdendrogram(values$hclustResults[[input$viewTarget]],
-                 rotate = TRUE)#, size = 2)
+                 rotate = TRUE, color = "red")#, size = 2)
   })
   
   output$meltPlot <- renderPlot({
@@ -351,24 +360,35 @@ shinyServer(function(input, output, server) {
   output$resultsTable <- renderDataTable({
     if (is.null(totalTable()))
       return()
-    totalTable()
+    if (input$tabset == "detail")
+      totalTable()
+    else
+      totalTable()[, -4]
   })
   
   output$createReport <- downloadHandler(
     filename  = "report.docx",
     content <- function(file) {
 #       src <- normalizePath('report.Rmd')
-#       
-#       # temporarily switch to the temp dir, in case you do not have write
-#       # permission to the current working directory
+# #       
+# #       # temporarily switch to the temp dir, in case you do not have write
+# #       # permission to the current working directory
+#       print(tempdir())
 #       owd <- setwd(tempdir())
-#       on.exit(setwd(owd))
+#       print(owd)
+#       print(getwd())
+#       # on.exit(setwd(owd))
 #       file.copy(src, 'report.Rmd')
 #       file.copy(src, 'style.docx')
+      # knit(input = paste0(getwd(), "/report.Rmd"), 
+      #              output = paste0(getwd(), "/report.md"), quiet = FALSE)
       knit(input = "report.Rmd", 
-                   output = "report.md", quiet = TRUE)
+           output = "report.md", quiet = TRUE)
       on.exit(unlink(c("report.md", "figure"), recursive = TRUE))
-      pander::Pandoc.convert(f = "report.md", format = "docx",
+      # pander::Pandoc.convert(f = paste0(getwd(), "/report.md"), format = "docx",
+      #                        options = sprintf("-s --reference-docx=%s/style.docx", getwd()),
+      #                        footer = FALSE)
+      pander::Pandoc.convert(f =  "report.md", format = "docx",
                              options = "-s --reference-docx=style.docx",
                              footer = FALSE)
 #       if (file.exists(paste0(file, ".docx")))

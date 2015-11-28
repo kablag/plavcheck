@@ -22,12 +22,12 @@ library(rlist)
 ### Сводная таблица
 
 ```{r, results = 'asis', echo=FALSE, message=FALSE}
+tbl <- totalTable()[, -4]
 kable(totalTable())
 ```
 
 ```{r, results='asis', echo=FALSE, message=FALSE}
-tbl <- totalTable()
-colnames(tbl) <- c("Sample", "Target", "Genotype", "r")
+colnames(tbl) <- c("Sample", "Target", "Genotype")
 out <- NULL
 for (sample.name in tbl$Sample %>% unique()) {
   out <- c(out, sprintf("## %s\n", sample.name))
